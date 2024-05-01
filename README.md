@@ -1,7 +1,3 @@
-Got it, let's remove the license section then:
-
----
-
 # Distributed Real-Time Text Editor
 
 Welcome to our Distributed Real-Time Text Editor project! This collaborative writing tool is designed to streamline teamwork on textual content across distributed networks. Whether you're collaborating with colleagues across the globe or working on a project with classmates, our editor offers a robust platform for real-time collaboration.
