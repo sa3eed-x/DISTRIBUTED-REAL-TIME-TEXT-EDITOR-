@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Text Editor</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container{
+            width: 80%;
+        }
+        #documentContent {
+            width: 100%;
+            height: 70vh;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            color: #333;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            caret-color: auto;
+        }
+
+        ::placeholder {
+            color: #aaa;
+        }
+
+        /* Custom scrollbar */
+        #editor::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #editor::-webkit-scrollbar-thumb {
+            background-color: #6a6a6a;
+            border-radius: 5px;
+        }
+
+        #editor::-webkit-scrollbar-track {
+            background-color: #eaeaea;
+        }
+        .remote-cursor {
+        position: absolute;
+        border-left: 2px solid red;
+        height: 1.2em;
+        margin-top: -1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Document: <%= chosenDocument.title %></h1>
+        <form method="post" action="/save-document">
+            <textarea id="documentContent" name="content" placeholder="Start typing..." oninput="updateDataset()"><%= chosenDocument.content %></textarea>
+            <input type="hidden" name="documentId" id="documentId" value="<%= chosenDocument._id %>">
+            <button type="submit">Save Document</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3000');
+    
+        var editor =document.getElementById('documentContent');
+        var documentId= document.getElementById('documentId')
+        // //cursors color
+        const remoteCursors = {};
+        // const getRandomColor = () => `#${Math.floor(Math.random()*16777215).toString(16)}`;
+        // const userColor = getRandomColor();
+        // const localCursor = createRemoteCursor(userColor);
+        // cursor change
+        // editor.addEventListener('selectionchange',async () => {
+        //     const selection = window.getSelection();
+        //     const cursorPos = selection.getRangeAt(0).endOffset;
+
+        //     // Broadcast cursor position and color to other clients
+        //     await socket.emit('cursorChange', { cursorPos, userColor });
+        // });
+        // socket.on('cursorChange', (data) => {
+        // if (data.id !== socket.id) {
+        //     updateRemoteCursor(data.id, data.cursorPos, data.userColor);
+        // }
+        // });
+        //text change
+        
+        editor.addEventListener('input',async function() {
+            var content = editor.value;
+            await socket.emit('text_update', {id: socket.id,content: content});
+        });
+        socket.on('text_update',function(data){
+            editor.value =data.content
+            // editor.caretPosition=data.caretPosition
+            var loc =editor.selectionStart
+            // console.log(loc);
+            // console.log(data);
+
+        });
+        
+        
+        //user connected
+        socket.on('userConnected', (data) => {
+            console.log(`User connected: ${data.id}`);
+            // console.log(data.userColor);
+
+            // editor.style.caretColor=data.userColor;
+            // Initialize remote cursor for the new user
+            // remoteCursors[data.id] = createRemoteCursor(data.userColor);
+        });
+
+        //user disconnected
+        socket.on('userDisconnected', (data) => {
+            console.log(`User disconnected: ${data.id}`);
+            // Remove remote cursor for the disconnected user
+            // removeRemoteCursor(data.id);
+        });
+        
+        // function createRemoteCursor(color) {
+        //     const cursor = document.createElement('div');
+        //     cursor.className = 'remote-cursor';
+        //     cursor.style.borderLeft = `2px solid ${color}`;
+        //     document.body.appendChild(cursor);
+        //     return cursor;
+        // }
+        // function updateRemoteCursor(userId, cursorPos, userColor) {
+        //     const cursor = remoteCursors[userId];
+        //     const charWidth = editor.clientWidth / editor.cols;
+        //     const cursorLeft = cursorPos * charWidth;
+        //     cursor.style.left = `${cursorLeft}px`;
+        //     cursor.style.borderLeftColor = userColor;
+        // }
+        // function removeRemoteCursor(userId) {
+        //     const cursor = remoteCursors[userId];
+        //     if (cursor) {
+        //         cursor.remove();
+        //         delete remoteCursors[userId];
+        //     }
+        // }
+        function updateDataset() {
+        var content = editor.value;
+        var id = documentId.value;
+
+        // Send an AJAX request to update the dataset on the server
+        $.ajax({
+            type: 'POST',
+            url: '/update-dataset', // Update this URL to your server endpoint
+            data: { content: content, documentId: id },
+            success: function(response) {
+                // Handle success if needed
+                console.log(response);
+            },
+            error: function(error) {
+                // Handle error if needed
+                console.error(error);
+            }
+        });
+    }
+
+    </script>
+    
+</body>
+</html>
+

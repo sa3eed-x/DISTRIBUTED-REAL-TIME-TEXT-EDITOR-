@@ -1,0 +1,135 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #495057;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    h1, h2 {
+      color: #007bff;
+    }
+
+    h2 {
+      margin-top: 20px;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #6c757d;
+    }
+
+    input,
+    select,
+    button {
+      margin-bottom: 10px;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #28a745;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    select {
+      appearance: none;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+
+    select:hover {
+      border-color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, <%= username %>!</h1>
+    <div>
+      <h2>Your Documents</h2>
+      <!-- List the user's documents -->
+      <ul>
+        <% documents.forEach(document => { %>
+          <li>
+            <strong><%= document.title %></strong>
+            <a href="/documents/<%= document._id %>">View Document</a>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+    <div>
+      <h2>Actions</h2>
+      <!-- Button to create a new document -->
+      <form method="post" action="/documents">
+        <label for="newDocumentTitle">New Document Title:</label>
+        <input type="text" id="newDocumentTitle" name="title" required>
+        <button type="submit">Create New Document</button>
+      </form>
+      <!-- Dropdown to choose an existing document -->
+      <form method="post" action="/choose-document">
+        <label for="existingDocument">Choose Existing Document:</label>
+        <select id="existingDocument" name="documentId">
+          <% documents.forEach(document => { %>
+            <option value="<%= document._id %>"><%= document.title %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Choose Document</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
