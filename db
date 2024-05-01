@@ -1,0 +1,25 @@
+const mongoose = require("mongoose");
+
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://asaid8806:123@cluster0.uquusc9.mongodb.net/dist?retryWrites=true&w=majority', {
+  // useNewUrlParser: true,
+  // useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB');
+});
+const userSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+});
+const documentSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+});
+
+const Document = mongoose.model('Document', documentSchema);
+const User = mongoose.model('User', userSchema);
